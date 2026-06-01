@@ -58,3 +58,16 @@ Expected behavior:
 - Calculator tool returns a result
 - Unsafe requests are refused
 - Each response includes response, emotion, action, memory_update, and used_tool
+
+## Run Backend and Frontend
+
+Start the FastAPI backend:
+
+uv run fastapi dev src/apps/backend.py --port 8000 
+
+In a second terminal, start the Chainlit frontend: 
+uv run chainlit run src/apps/frontend.py -w --port 8001 
+Open the Chainlit UI: http://127.0.0.1:8001 
+
+The Chainlit frontend calls the FastAPI backend at: 
+POST http://127.0.0.1:8000/api/v1/character/chat
