@@ -76,7 +76,7 @@ class ToolService:
     Tool service for the AI character agent.
 
     Current tools:
-    - calculator tool triggered by: calculate: 2 + 2
+    - calculator tool triggered by: calculate: 2 + 2 or calc: 2 + 2
     - action guide for fake animation states
     """
 
@@ -95,9 +95,15 @@ class ToolService:
 
             try:
                 result = self._calculator.calculate(expression)
+
+                if isinstance(result, float) and result.is_integer():
+                    formatted_result = str(int(result))
+                else:
+                    formatted_result = str(result)
+
                 return ToolResult(
                     name="calculator",
-                    content=f"Calculator result for '{expression}' is {result}.",
+                    content=f"Calculator result for '{expression}' is {formatted_result}.",
                 )
             except Exception as error:
                 return ToolResult(
