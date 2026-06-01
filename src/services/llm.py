@@ -6,7 +6,7 @@ from typing import Literal, Optional
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
+from langchain_mistralai import ChatMistralAI
 from pydantic import BaseModel, Field, ValidationError
 
 
@@ -52,47 +52,42 @@ class LLMService(ABC):
         raise NotImplementedError
 
 
-class OpenRouterLLMService(LLMService):
+class MistralLLMService(LLMService):
     def __init__(
         self,
         model_name: Optional[str] = None,
         api_key: Optional[str] = None,
-        temperature: float = 0.4,
+        temperature: float = 0.2,
         max_tokens: Optional[int] = None,
     ) -> None:
-        self.model_name = model_name or os.getenv("OPENROUTER_MODEL", "openrouter/free")
-        self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
+        self.model_name = model_name or os.getenv("MISTRAL_MODEL", "mistral-small-2506")
+        self.api_key = api_key or os.getenv("MISTRAL_API_KEY")
 
         if not self.api_key:
-            raise ValueError("OPENROUTER_API_KEY is missing. Add it to your .env file.")
+            raise ValueError("MISTRAL_API_KEY is missing. Add it to your .env file.")
 
         self.max_tokens = max_tokens or self._get_max_tokens_from_env()
 
-        self._llm = ChatOpenAI(
+        self._llm = ChatMistralAI(
             model=self.model_name,
             api_key=self.api_key,
-            base_url="https://openrouter.ai/api/v1",
             temperature=temperature,
             max_tokens=self.max_tokens,
             timeout=60,
             max_retries=2,
-            default_headers={
-                "HTTP-Referer": "http://localhost:8000",
-                "X-Title": "AI Character Agent MVP",
-            },
         )
 
     @staticmethod
     def _get_max_tokens_from_env() -> int:
-        raw_value = os.getenv("OPENROUTER_MAX_TOKENS", "500")
+        raw_value = os.getenv("MISTRAL_MAX_TOKENS", "500")
 
         try:
             max_tokens = int(raw_value)
         except ValueError:
-            raise ValueError("OPENROUTER_MAX_TOKENS must be an integer, for example 500.")
+            raise ValueError("MISTRAL_MAX_TOKENS must be an integer, for example 500.")
 
         if max_tokens <= 0:
-            raise ValueError("OPENROUTER_MAX_TOKENS must be greater than 0.")
+            raise ValueError("MISTRAL_MAX_TOKENS must be greater than 0.")
 
         return max_tokens
 
@@ -136,9 +131,10 @@ Rules:
         """
         Parse model output into CharacterStateDTO.
 
-        Some models may return extra text before or after JSON.
-        This parser first tries direct JSON parsing, then extracts the first JSON object.
-        If everything fails, it returns a safe fallback.
+        Mistral usually follows JSON instructions well, but this parser is defensive:
+        1. Try direct JSON parsing.
+        2. Try extracting the first JSON object.
+        3. Return safe fallback if parsing fails.
         """
         try:
             data = json.loads(content)

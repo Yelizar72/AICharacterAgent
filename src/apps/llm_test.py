@@ -1,6 +1,6 @@
 import asyncio
 
-from src.services.llm import OpenRouterLLMService
+from src.services.llm import MistralLLMService
 
 
 SYSTEM_PROMPT = """
@@ -20,7 +20,7 @@ Behavior:
 
 
 async def main() -> None:
-    service = OpenRouterLLMService()
+    service = MistralLLMService()
 
     result = await service.generate_character_state(
         system_prompt=SYSTEM_PROMPT,
