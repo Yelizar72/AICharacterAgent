@@ -4,16 +4,16 @@ from fastapi import Depends
 
 from src.services.character_agent import CharacterAgentService
 from src.services.llm import MistralLLMService
-from src.services.memory import InMemoryMemoryService
+from src.services.memory import SQLiteMemoryService
 from src.services.rag import SimpleRAGService
 from src.services.tools import ToolService
 
 
 # Singleton service instances.
 # They are created once when the backend starts.
-# This is important because memory should persist while the app is running.
+# SQLite memory persists even after backend restart.
 llm_service = MistralLLMService()
-memory_service = InMemoryMemoryService()
+memory_service = SQLiteMemoryService()
 rag_service = SimpleRAGService()
 tool_service = ToolService()
 

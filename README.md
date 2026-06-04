@@ -96,3 +96,36 @@ RAG grounding	Nova answers backstory questions using the character profile
 Tool correctness	Calculator requests return the correct result and set used_tool to calculator
 Safety behavior	Unsafe requests are refused and redirected to safe alternatives
 Personality stability	Nova remains friendly, supportive, and engineering-oriented
+
+## Persistent SQLite Memory
+
+The agent supports persistent short-term memory using SQLite.
+
+By default, memory is stored in:
+
+```text
+data/agent_memory.sqlite3
+
+The memory database path can be configured with:
+
+MEMORY_DB_PATH=data/agent_memory.sqlite3
+
+The SQLite memory layer stores:
+
+chat_id
+memory
+created_at
+
+This allows Nova to remember user preferences across backend restarts when the same chat_id is used.
+
+Example:
+
+User: Hi Nova, I like robotics and PCB design.
+Nova stores: User likes robotics and PCB design.
+
+After backend restart:
+
+User: What do I like?
+Nova: You told me that you like robotics and PCB design.
+
+Local SQLite database files are ignored by Git and should not be committed.

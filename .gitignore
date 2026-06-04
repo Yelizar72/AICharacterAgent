@@ -30,3 +30,9 @@ env/
 dist/
 build/
 *.egg-info/
+
+# Local SQLite databases
+data/*.sqlite3
+data/*.db
+*.sqlite3
+*.db

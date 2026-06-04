@@ -4,7 +4,7 @@ from pathlib import Path
 
 from src.services.character_agent import CharacterAgentService
 from src.services.llm import MistralLLMService
-from src.services.memory import InMemoryMemoryService
+from src.services.memory import SQLiteMemoryService
 from src.services.rag import SimpleRAGService
 from src.services.tools import ToolService
 
@@ -12,15 +12,23 @@ from src.services.tools import ToolService
 EVAL_CASES_PATH = Path("eval/eval_cases.json")
 
 
-async def run_eval_case(agent: CharacterAgentService, case: dict) -> None:
+async def run_eval_case(
+    agent: CharacterAgentService,
+    memory_service: SQLiteMemoryService,
+    case: dict,
+) -> None:
     print("\n" + "=" * 100)
     print(f"EVAL CASE: {case['name']}")
     print(f"DESCRIPTION: {case['description']}")
+
     print("\nEXPECTED BEHAVIOR:")
     for item in case["expected_behavior"]:
         print(f"- {item}")
 
     chat_id = case["chat_id"]
+
+    # Clear memory for each eval case so tests are repeatable.
+    memory_service.clear_memory(chat_id)
 
     for message in case["messages"]:
         print("\n" + "-" * 100)
@@ -44,7 +52,7 @@ async def main() -> None:
     eval_cases = json.loads(EVAL_CASES_PATH.read_text(encoding="utf-8"))
 
     llm_service = MistralLLMService()
-    memory_service = InMemoryMemoryService()
+    memory_service = SQLiteMemoryService(db_path="data/eval_memory.sqlite3")
     rag_service = SimpleRAGService()
     tool_service = ToolService()
 
@@ -56,7 +64,7 @@ async def main() -> None:
     )
 
     for case in eval_cases:
-        await run_eval_case(agent, case)
+        await run_eval_case(agent, memory_service, case)
 
     print("\n" + "=" * 100)
     print("Evaluation run completed.")
