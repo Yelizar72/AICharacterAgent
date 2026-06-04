@@ -36,3 +36,6 @@ data/*.sqlite3
 data/*.db
 *.sqlite3
 *.db
+
+# Chroma vector database
+data/chroma/

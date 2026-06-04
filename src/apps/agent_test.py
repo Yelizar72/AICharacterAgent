@@ -3,14 +3,14 @@ import asyncio
 from src.services.character_agent import CharacterAgentService
 from src.services.llm import MistralLLMService
 from src.services.memory import SQLiteMemoryService
-from src.services.rag import SimpleRAGService
+from src.services.rag import ChromaRAGService
 from src.services.tools import ToolService
 
 
 async def main() -> None:
     llm_service = MistralLLMService()
     memory_service = SQLiteMemoryService(db_path="data/agent_test_memory.sqlite3")
-    rag_service = SimpleRAGService()
+    rag_service = ChromaRAGService()
     tool_service = ToolService()
 
     agent = CharacterAgentService(

@@ -5,16 +5,17 @@ from fastapi import Depends
 from src.services.character_agent import CharacterAgentService
 from src.services.llm import MistralLLMService
 from src.services.memory import SQLiteMemoryService
-from src.services.rag import SimpleRAGService
+from src.services.rag import ChromaRAGService
 from src.services.tools import ToolService
 
 
 # Singleton service instances.
 # They are created once when the backend starts.
-# SQLite memory persists even after backend restart.
+# SQLite memory persists after backend restart.
+# Chroma vector RAG loads from data/chroma.
 llm_service = MistralLLMService()
 memory_service = SQLiteMemoryService()
-rag_service = SimpleRAGService()
+rag_service = ChromaRAGService()
 tool_service = ToolService()
 
 character_agent_service = CharacterAgentService(

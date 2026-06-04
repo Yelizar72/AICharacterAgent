@@ -129,3 +129,34 @@ User: What do I like?
 Nova: You told me that you like robotics and PCB design.
 
 Local SQLite database files are ignored by Git and should not be committed.
+
+## Vector RAG with Chroma
+
+The project supports vector-based RAG using Chroma and Mistral embeddings.
+
+The vector index is built from:
+
+```text
+src/data/character_profile.md
+src/data/m365_docs/*.md
+src/data/m365_docs/*.txt
+
+Chroma stores the local vector database in:
+
+data/chroma/
+
+The embedding model is configured with:
+
+MISTRAL_EMBEDDING_MODEL=mistral-embed
+CHROMA_PERSIST_DIR=data/chroma
+CHROMA_COLLECTION_NAME=ai_character_agent_docs
+
+Build or rebuild the vector index:
+
+uv run python -m src.apps.build_vector_index
+
+Test retrieval:
+
+uv run python -m src.apps.rag_test
+
+The Chroma RAG service retrieves semantically relevant chunks from the character profile and Microsoft 365-style documents, such as brand guidelines, tone-of-voice rules, and design constraints.
